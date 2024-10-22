@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "MyNewProject",
+    "slug": "MyNewProject",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#d9e997"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#d9e997"
+      },
+      "package": "com.cogollos.MyNewProject"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4bf3fd29-17fb-49f8-8300-7f60f01266f2"
+      }
+    }
+  }
+}
