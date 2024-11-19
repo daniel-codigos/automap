@@ -145,11 +145,11 @@ export default function LoginScreen() {
         if (data.length === 0) {
           console.log("No hay partes para descontar!");
         } else {
-          setListaPartes(data);
+          setListaPartes(data.info);
           await SecureStore.setItemAsync('Linfo', JSON.stringify(data));
-          data.forEach(cada_parte => {
-            console.log(cada_parte);
-          });
+          //data.forEach(cada_parte => {
+            //console.log(cada_parte);
+          //});
         }
         setLoading(false);
         setEmpezar(true);
@@ -164,6 +164,13 @@ export default function LoginScreen() {
 
   const handleNotification = () => {
     sendNotification('Descuento completado', '¡Listo! Se ha terminado de descontar correctamente!.');
+  };
+
+  async function delCookies() {
+    console.log("delete cookies")
+    const token2 = await SecureStore.getItemAsync('token_map');
+    console.log(token2)
+    //SecureStore.deleteItemAsync('token_map');
   };
 
   const finPartes = async () => {
@@ -345,6 +352,9 @@ export default function LoginScreen() {
           {!loadingPar ? 
                       <View>
                         <Image source={require('./assets/robot.png')} style={styles.logo} />
+                        <TouchableOpacity style={styles.startButton} onPress={delCookies}>
+                          <Text style={styles.startButtonText}>delete Cookies</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity style={styles.startButton} onPress={handleNotification}>
                           <Text style={styles.startButtonText}>test botify</Text>
                         </TouchableOpacity>
