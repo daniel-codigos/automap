@@ -8,6 +8,9 @@ import * as SecureStore from 'expo-secure-store';
 import AddImporteModal from './AddImporteModal';
 import AddExtraModal from './AddExtraModal'; // Importa tu nuevo modal
 import { sendNotification, requestPermissions } from "./usePushNotifications";
+import StartOptions from './componentes/Inicio'; 
+import FinalView from './componentes/Finpartes'; // Ajusta la ruta si está en una subcarpeta
+import ParteCard from './componentes/CardPartes'; // Importa el componente
 
 const { width } = Dimensions.get('window');
 
@@ -147,8 +150,9 @@ export default function LoginScreen() {
         } else {
           setListaPartes(data.info);
           await SecureStore.setItemAsync('Linfo', JSON.stringify(data));
+          sendNotification('Lista disponible', '¡Listo! Se ha terminado la lista de partes!.');
           //data.forEach(cada_parte => {
-            //console.log(cada_parte);
+            //console.log(cada_parte);v26762951
           //});
         }
         setLoading(false);
@@ -270,75 +274,23 @@ export default function LoginScreen() {
             </View>
 
             {listaPartes.map((cadaParte, indexPar) => (
-              <View key={indexPar} style={styles.parteCard}>
-                <View style={styles.parteHeader}>
-                  <Text style={styles.parteHeaderText}>NºExp: {cadaParte.expediente}</Text>
-                  <Text style={styles.parteHeaderText}>CP: {cadaParte.cp}</Text>
-                  <Text style={styles.parteHeaderText}>{cadaParte.f_asignacion}</Text>
-                  <Text style={styles.parteHeaderText}>{cadaParte.calle}</Text>
-                  {cadaParte.brico === "si" && <Text style={[styles.parteHeaderText, styles.bricoText]}>Brico</Text>}
-                  <Text style={[styles.parteHeaderText, cadaParte.tipo !== "ELECTRICIDAD" && styles.nonElectricText]}>{cadaParte.tipo}</Text>
-                  {cadaParte.urgencia === "si" && <Text style={[styles.parteHeaderText, styles.urgenciaText]}>URGENCIA</Text>}
-                </View>
-                <Text style={styles.parteDescription} selectable={true}>{cadaParte.descripcion}</Text>
-                <View style={styles.importesContainer}>
-                  {cadaParte.importes.map((cadaImporte, indexImp) => (
-                    <TouchableOpacity
-                      key={indexImp}
-                      style={[
-                        styles.impBtn,
-                        selectedImp.par === indexPar && selectedImp.imp === indexImp && styles.selectedImpBtn
-                      ]}
-                      onPress={() => selectImp(indexImp, indexPar)}
-                      onLongPress={() => deleteImp()}
-                    >
-                      <Text style={styles.importeText}>{cadaImporte}</Text>
-                    </TouchableOpacity>
-                  ))}
-
-                  <TouchableOpacity onPress={() => {
-                    setNewImpWin(true);
-                    setcualnewimp(indexPar);
-                  }}>
-                    <Text style={styles.addImpText}>➕</Text>
-                  </TouchableOpacity>
-
-                </View>
-                <View style={styles.extrasContainer}>
-                  <TouchableOpacity style={styles.extrasButton} onPress={() => {
-                    //on press extras
-                    setNewExtraWin(true);
-                    setcualnewextra(indexPar);
-                  }}>
-                    <Text style={styles.extrasButtonText}>Extras</Text>
-                  </TouchableOpacity>
-                  {cadaParte.itos && (
-                    <View style={styles.extrasTextContainer}>
-                      <TouchableOpacity 
-                        onPress={() => selectExtra(indexPar,"rele")}
-                        onLongPress={() => deleteExtra(indexPar,'rele')}
-                        style={selectedExtras.cual === "rele" && selectedExtras.parte == indexPar ? {backgroundColor:'red'} : null}
-                      >
-                        <Text style={styles.extrasText}>{cadaParte.itos.rele !== "" ? "Informacion relevante: " + cadaParte.itos.rele : ""}</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity 
-                        onPress={() => selectExtra(indexPar,"exclu")}
-                        onLongPress={() => deleteExtra(indexPar,'exclu')}
-                        style={selectedExtras.cual === "exclu" && selectedExtras.parte === indexPar ? {backgroundColor:'red'} : null}
-                      >
-                        <Text style={styles.extrasText}>{cadaParte.itos.exclu !== "" ? "Exclusion: " + cadaParte.itos.exclu : ""}</Text>
-                      </TouchableOpacity>
-                      
-                    </View>
-                  )}
-                </View>
-                <TouchableOpacity onPress={() => deleteParte(indexPar)} style={styles.deleteParteButton}>
-                  <Text style={styles.deleteParteButtonText}>X</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => saveParte(indexPar)} style={styles.saveParteButton}>
-                  <Text style={styles.deleteParteButtonText}>saveit!</Text>
-                </TouchableOpacity>
-              </View>
+              <ParteCard
+                key={indexPar}
+                cadaParte={cadaParte}
+                indexPar={indexPar}
+                selectedImp={selectedImp}
+                selectImp={selectImp}
+                deleteImp={deleteImp}
+                setNewImpWin={setNewImpWin}
+                setcualnewimp={setcualnewimp}
+                setNewExtraWin={setNewExtraWin}
+                setcualnewextra={setcualnewextra}
+                selectExtra={selectExtra}
+                deleteExtra={deleteExtra}
+                selectedExtras={selectedExtras}
+                deleteParte={deleteParte}
+                saveParte={saveParte}
+            />
             ))}
             {progress === '' && (
             <TouchableOpacity style={styles.terminarButton} onPress={finPartes}>
@@ -350,18 +302,11 @@ export default function LoginScreen() {
 
           <View style={styles.startContainer}>
           {!loadingPar ? 
-                      <View>
-                        <Image source={require('./assets/robot.png')} style={styles.logo} />
-                        <TouchableOpacity style={styles.startButton} onPress={delCookies}>
-                          <Text style={styles.startButtonText}>delete Cookies</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.startButton} onPress={handleNotification}>
-                          <Text style={styles.startButtonText}>test botify</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.startButton} onPress={empezamos}>
-                          <Text style={styles.startButtonText}>Empezar</Text>
-                        </TouchableOpacity>
-                      </View>
+                    <StartOptions
+                          delCookies={delCookies}
+                          handleNotification={handleNotification}
+                          empezamos={empezamos}
+                    />
 
                         :
                         null
@@ -388,20 +333,7 @@ export default function LoginScreen() {
         </View>
       )}
         {progress === "FIIIIIIIIN" && (
-          <View style={styles.loadingContainer}>
-            <Text>Partes no descontados:</Text>
-            {noFin && noFin.length > 0 ? (
-              // Aquí verificamos que noFin es un array y tiene elementos
-              noFin.map((cada, index) => (
-                  <Text key={index}>{cada.expediente}</Text>
-              ))
-            ) : (
-              <Text>No hay datos para mostrar.</Text>
-            )}
-            <TouchableOpacity style={styles.terminarButton} onPress={deleteFullList}>
-              <Text style={styles.terminarButtonText}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
+          <FinalView noFin={noFin} deleteFullList={deleteFullList} />
         )}
         <AddImporteModal
           visible={newImpWin}
@@ -429,15 +361,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    width: width,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor: '#f5f5f5',
     paddingHorizontal: 10,
-  },
-  loadingContainer: {
-    marginTop: 20,
-    alignItems: 'center',
   },
   partesContainer: {
     width: '100%',
@@ -462,109 +389,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
-  parteCard: {
-    backgroundColor: '#FCDC94',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  parteHeader: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 10,
-  },
-  parteHeaderText: {
-    fontSize: 16,
-    marginRight: 10,
-    color: '#2d3436',
-  },
-  bricoText: {
-    color: '#00b894',
-  },
-  nonElectricText: {
-    color: '#d63031',
-  },
-  urgenciaText: {
-    color: '#e17055',
-  },
-  parteDescription: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: '#2d3436',
-  },
-  importesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
-  impBtn: {
-    backgroundColor: '#74b9ff',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    marginRight: 5,
-    marginBottom: 5,
-  },
-  selectedImpBtn: {
-    backgroundColor: '#ff7675',
-  },
-  importeText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  addImpText: {
-    fontSize: 25,
-    color: '#74b9ff',
-  },
-  extrasContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  extrasButton: {
-    backgroundColor: '#55efc4',
-    padding: 10,
-    borderRadius: 20,
-  },
-  extrasButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  extrasTextContainer: {
-    marginLeft: 10,
-  },
-  extrasText: {
-    fontSize: 14,
-    color: '#2d3436',
-  },
-  deleteParteButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: '#ff7675',
-    borderRadius: 15,
-    padding: 5,
-  },
-  saveParteButton:{
-    position: 'absolute',
-    top: 10,
-    right: 40,
-    backgroundColor: '#160092',
-    borderRadius: 15,
-    padding: 5,
-  },
-  deleteParteButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
   terminarButton: {
     backgroundColor: '#fdcb6e',
     paddingVertical: 12,
@@ -581,24 +405,6 @@ const styles = StyleSheet.create({
   startContainer: {
     alignItems: 'center',
   },
-  logo: {
-    width: 100,
-    height: 100,
-    resizeMode: 'contain',
-    marginBottom: 32,
-  },
-  startButton: {
-    backgroundColor: '#6c5ce7',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  startButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   modalBackground: {
     flex: 1,
     alignItems: 'center',
@@ -613,5 +419,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    marginTop: 20,
+    alignItems: 'center',
   },
 });
