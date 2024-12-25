@@ -26,7 +26,11 @@ export default function LoginScreen() {
   const [newExtraWin, setNewExtraWin] = useState(false);
   const [loadingPar, setLoadingPar] = useState(false);
   const [progress, setProgress] = useState('');
+  const [progressChannels, setProgressChannels] = useState([]);
   const [noFin, setNoFin] = useState([])
+  const [terminado, setTerminado] = useState(false)
+  const [finInfo, setFinFinfo] = useState(false)
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,7 +78,9 @@ export default function LoginScreen() {
     setListaPartes([]);
     setNoFin([])
     setProgress('')
+    //setTerminado(true)
     setEmpezar(false)
+    setFinFinfo(false)
   } 
 
   const deleteImp = () => {
@@ -180,46 +186,93 @@ export default function LoginScreen() {
   const finPartes = async () => {
     setLoadingPar(true);
     await SecureStore.deleteItemAsync('Linfo');
-    setListaPartes([]);
-  
-    console.log("vamos a enviar los datos");
+    setEmpezar(false)
+    setTerminado(true);
+    setFinFinfo(true)
+    console.log("Vamos a enviar los datos");
     console.log(listaPartes);
+  
+    let ws;
   
     try {
       const token = await SecureStore.getItemAsync("token_map");
-
-      const response = await axios.post(`http://${ip.ips.elegido}/api/user2/fin`, { 'info': listaPartes }, {
-        headers: {
-          'Authorization': `Bearer ${String(JSON.parse(token).access)}`,
-        }
-      });
-
-      console.log(await response.status);
-      if (response.status === 200) {
-        setLoadingPar(false);
-        
-        console.log(response.data.info);
-        if (response.data.info.length > 0) {
-          sendNotification('Descuento completado', 'Han quedado partes por descontar! Revisa!.');
-        }else{
-          sendNotification('Descuento completado', '¡Listo! Se ha terminado de descontar correctamente!.');
-        }
-        setNoFin(response.data.info)
-        console.log("FIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIN");
-        setProgress("FIIIIIIIIN");
-        
-      } else {
-        setLoadingPar(false);
-        console.error('Error al enviar los datos:', response.status);
-        alert('Error al enviar los datos. Inténtalo de nuevo.');
-      }
   
+      // Inicializar el WebSocket
+      const ws = new WebSocket(`ws://${ip.ips.elegido}/ws/process?user=cogollos&token=${JSON.parse(token).access}`);
+  
+      ws.onopen = () => {
+        console.log("WebSocket conectado");
+      };
+  
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log(data)
+          if (data) {
+            console.log("Progreso recibido:", data.data.expediente);
+            setProgressChannels((prevChannels) => [...prevChannels, data]);
+          }
+        } catch (error) {
+          console.error("Error al procesar mensaje de WebSocket:", error);
+        }
+      };
       
+      ws.onerror = (error) => {
+        console.error("Error en WebSocket:", error);
+      };
+  
+      ws.onclose = () => {
+        console.log("WebSocket cerrado");
+      };
+  
+      // Enviar datos iniciales a la API
+      const response = await axios.post(
+        `http://${ip.ips.elegido}/api/user2/fin`,
+        { info: listaPartes },
+        {
+          headers: {
+            Authorization: `Bearer ${String(JSON.parse(token).access)}`,
+          },
+          timeout: 1800000, // 30 minutos
+        }
+      );
+  
+      if (response.status === 200) {
+        console.log(response.data.info);
+        setListaPartes([]);
+        if (response.data.info.length > 0) {
+          sendNotification(
+            "Descuento completado",
+            "Han quedado partes por descontar! Revisa!."
+          );
+        } else {
+          sendNotification(
+            "Descuento completado",
+            "¡Listo! Se ha terminado de descontar correctamente!."
+          );
+        }
+        setNoFin(response.data.info);
+        console.log(
+          "FIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIN"
+        );
+        setProgress("FIIIIIIIIN");
+      } else {
+        console.error("Error al enviar los datos:", response.status);
+        alert("Error al enviar los datos. Inténtalo de nuevo.");
+      }
     } catch (error) {
       console.error("Error:", error);
+      alert("Ocurrió un error inesperado. Revisa la conexión o los datos.");
+    } finally {
       setLoadingPar(false);
+  
+      // Cerrar WebSocket si está abierto
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
     }
   };
+  
   
 
   const terminarPartes = async () => {
@@ -261,10 +314,16 @@ export default function LoginScreen() {
     setListaPartes(newList);
   };
 
+
+
+
+
+
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {empezar || listaPartes.length > 0 ? (
+        {empezar ? (
           <View style={styles.partesContainer}>
             <View style={styles.headerContainer}>
               <Text style={styles.headerText}>Lista de Partes</Text>
@@ -292,16 +351,16 @@ export default function LoginScreen() {
                 saveParte={saveParte}
             />
             ))}
-            {progress === '' && (
-            <TouchableOpacity style={styles.terminarButton} onPress={finPartes}>
-              <Text style={styles.terminarButtonText}>Terminar</Text>
-            </TouchableOpacity>
+            {!terminado && !loadingPar && (
+              <TouchableOpacity style={styles.terminarButton} onPress={finPartes}>
+                <Text style={styles.terminarButtonText}>Terminar</Text>
+              </TouchableOpacity>
             )}
           </View>
         ) : (
 
           <View style={styles.startContainer}>
-          {!loadingPar ? 
+          {!loadingPar && !finInfo ? 
                     <StartOptions
                           delCookies={delCookies}
                           handleNotification={handleNotification}
@@ -329,7 +388,7 @@ export default function LoginScreen() {
         {loadingPar && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Procesando... {progress}</Text>
+          <Text>Descontando... {progressChannels.length}/{listaPartes.length}</Text>
         </View>
       )}
         {progress === "FIIIIIIIIN" && (

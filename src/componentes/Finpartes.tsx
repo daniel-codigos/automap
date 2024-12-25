@@ -4,15 +4,18 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 const FinalView = ({ noFin, deleteFullList }) => {
   return (
     <View style={styles.loadingContainer}>
-      <Text style={styles.title}>Partes no descontados:</Text>
+      <Text style={styles.title}>Descuentos finalizados!</Text>
       {noFin && noFin.length > 0 ? (
         noFin.map((cada, index) => (
-          <Text key={index} style={styles.itemText}>
-            {cada.expediente}
-          </Text>
+          <View>
+            <Text style={styles.title}>Partes no descontados:</Text>
+            <Text key={index} style={styles.itemText}>
+              {cada.expediente}
+            </Text>
+          </View>
         ))
       ) : (
-        <Text style={styles.itemText}>No hay datos para mostrar.</Text>
+        <Text style={styles.itemText}>Se ha finalizado correctamente.</Text>
       )}
       <TouchableOpacity style={styles.terminarButton} onPress={deleteFullList}>
         <Text style={styles.terminarButtonText}>Cerrar</Text>

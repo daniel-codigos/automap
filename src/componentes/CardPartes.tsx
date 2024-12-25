@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
 
 const ParteCard = ({
     cadaParte,
@@ -17,13 +17,27 @@ const ParteCard = ({
     deleteParte,
     saveParte,
 }) => {
+  const [editedText, setEditedText] = useState('');
+  const [isModalVisiblEditText, setModalVisiblEditText] = useState(false);
+
+  const handleSave = () => {
+    //updateDescripcion(editedText); // Llama a la función para actualizar el texto
+    //cadaParte.descripcion = 
+    //setEditedText()
+    cadaParte.modText = true
+    cadaParte.descripcion = editedText
+    console.log(editedText)
+    console.log(cadaParte)
+    setModalVisiblEditText(false); // Cierra el modal
+  };
+
     return (
         <View key={indexPar} style={styles.parteCard}>
             <View style={{flexDirection:"row",justifyContent: "flex-end"}}>
                 <TouchableOpacity onPress={() => saveParte(indexPar)} style={styles.saveParteButton}>
                     <Text style={styles.deleteParteButtonText}>saveit!</Text>
                 </TouchableOpacity>
-                    <TouchableOpacity onPress={() => deleteParte(indexPar)} style={styles.deleteParteButton}>
+                  <TouchableOpacity onPress={() => deleteParte(indexPar)} style={styles.deleteParteButton}>
                     <Text style={styles.deleteParteButtonText}>X</Text>
                 </TouchableOpacity>
             </View>
@@ -47,9 +61,55 @@ const ParteCard = ({
               <Text style={[styles.parteHeaderText, styles.urgenciaText]}>URGENCIA</Text>
             )}
           </View>
-          <Text style={styles.parteDescription} selectable={true}>
-            {cadaParte.descripcion}
-          </Text>
+
+          <View>
+      <Text style={styles.parteDescription} selectable={true}>
+        {cadaParte.descripcion}
+      </Text>
+      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+        <TouchableOpacity
+          onPress={() => {
+            setModalVisiblEditText(true)
+            setEditedText(cadaParte.descripcion)
+          }}
+          style={styles.editParte}
+        >
+          <Text style={styles.editParteButtonText}>Editar Texto</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Modal para editar el texto */}
+      <Modal
+        visible={isModalVisiblEditText}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisiblEditText(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Descripción</Text>
+            <TextInput
+              style={styles.textInput}
+              multiline={true}
+              value={editedText}
+              onChangeText={setEditedText}
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                onPress={() => setModalVisiblEditText(false)}
+                style={styles.cancelButton}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+                <Text style={styles.buttonText}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
+
           <View style={styles.importesContainer}>
             {cadaParte.importes.map((cadaImporte: string, indexImp: number) => (
               <TouchableOpacity
@@ -222,9 +282,65 @@ const styles = StyleSheet.create({
     padding: 5,
     marginRight:10,
   },
+  editParte:{
+    width:90,
+    backgroundColor: '#160092',
+    borderRadius: 15,
+    padding: 5,
+    //marginRight:10,
+  },
   deleteParteButtonText: {
     color: 'white',
     fontSize: 16,
+  },
+  editParteButtonText: {
+    color: "#ffffff",
+    fontSize: 14,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#ffffff",
+    width: "80%",
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: "#cccccc",
+    borderRadius: 5,
+    padding: 10,
+    height: 100,
+    textAlignVertical: "top",
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cancelButton: {
+    backgroundColor: "#f44336",
+    padding: 10,
+    borderRadius: 5,
+  },
+  saveButton: {
+    backgroundColor: "#2196f3",
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontSize: 14,
   },
 });
 

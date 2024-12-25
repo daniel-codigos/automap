@@ -5,11 +5,8 @@ const StartOptions = ({ delCookies, handleNotification, empezamos }) => {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/robot.png')} style={styles.logo} />
-      <TouchableOpacity style={styles.startButton} onPress={delCookies}>
+      <TouchableOpacity style={[styles.startButton,{"backgroundColor":"red"}]} onPress={delCookies}>
         <Text style={styles.startButtonText}>delete Cookies</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.startButton} onPress={handleNotification}>
-        <Text style={styles.startButtonText}>test botify</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.startButton} onPress={empezamos}>
         <Text style={styles.startButtonText}>Empezar</Text>
