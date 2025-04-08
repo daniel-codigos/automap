@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MyNewProject",
-    "slug": "MyNewProject",
+    "name": "automap",
+    "slug": "automap",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +19,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#d9e997"
       },
-      "package": "com.cogollos.MyNewProject"
+      "package": "com.cogollos.automap"
     },
     "web": {
       "favicon": "./assets/favicon.png"

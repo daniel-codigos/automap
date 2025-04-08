@@ -31,6 +31,7 @@ export default function LoginScreen() {
   const [noFin, setNoFin] = useState([])
   const [terminado, setTerminado] = useState(false)
   const [finInfo, setFinFinfo] = useState(false)
+  const [testOnOff, setTestOnOff] = useState(false);
   
 
   useEffect(() => {
@@ -70,6 +71,7 @@ export default function LoginScreen() {
         return response.data;
       } catch (error) {
         console.error('Error al verificar el token:', error);
+        alert("asdasdasdasd2");
         alert(error);
         return null;
       }
@@ -142,7 +144,7 @@ export default function LoginScreen() {
     try {
       setLoading(true)
       const token = await SecureStore.getItemAsync("token_map");
-      const response = await axios.get('http://'+ip['ips']['elegido']+'/api/user2/start', {
+      const response = await axios.post('http://'+ip['ips']['elegido']+'/api/user2/start', {'infotest':testOnOff},{
         headers: {
           'Authorization': `Bearer ${String(JSON.parse(token).access)}`,
         }
@@ -168,6 +170,7 @@ export default function LoginScreen() {
       return response.data;
     } catch (error) {
       console.error('Error al verificar el token:', error);
+      alert("asdasdasdasd12");
       alert(error);
       return null;
     }
@@ -351,6 +354,7 @@ export default function LoginScreen() {
                 selectedExtras={selectedExtras}
                 deleteParte={deleteParte}
                 saveParte={saveParte}
+                testinfo={testOnOff}
             />
             ))}
             {!terminado && !loadingPar && (
@@ -367,6 +371,7 @@ export default function LoginScreen() {
                           delCookies={delCookies}
                           handleNotification={handleNotification}
                           empezamos={empezamos}
+                          testinfo={[testOnOff,setTestOnOff]}
                     />
 
                         :
@@ -451,7 +456,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   terminarButton: {
-    backgroundColor: '#fdcb6e',
+    backgroundColor: '#74b9ff',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 20,

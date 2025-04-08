@@ -16,10 +16,12 @@ const ParteCard = ({
     selectedExtras,
     deleteParte,
     saveParte,
+    testinfo
 }) => {
   const [editedText, setEditedText] = useState('');
   const [isModalVisiblEditText, setModalVisiblEditText] = useState(false);
-
+  //console.log(cadaParte)
+  console.log(testinfo)
   const handleSave = () => {
     //updateDescripcion(editedText); // Llama a la función para actualizar el texto
     //cadaParte.descripcion = 
@@ -33,11 +35,12 @@ const ParteCard = ({
 
     return (
         <View key={indexPar} style={styles.parteCard}>
-            <View style={{flexDirection:"row",justifyContent: "flex-end"}}>
+            <View style={{flexDirection:"row",justifyContent: "flex-end", marginBottom:10}}>
                 <TouchableOpacity onPress={() => saveParte(indexPar)} style={styles.saveParteButton}>
                     <Text style={styles.deleteParteButtonText}>saveit!</Text>
                 </TouchableOpacity>
-                  <TouchableOpacity onPress={() => deleteParte(indexPar)} style={styles.deleteParteButton}>
+
+                <TouchableOpacity onPress={() => deleteParte(indexPar)} style={styles.deleteParteButton}>
                     <Text style={styles.deleteParteButtonText}>X</Text>
                 </TouchableOpacity>
             </View>
@@ -66,7 +69,7 @@ const ParteCard = ({
       <Text style={styles.parteDescription} selectable={true}>
         {cadaParte.descripcion}
       </Text>
-      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+      <View style={{ flexDirection: "row", justifyContent: "flex-end" ,}}>
         <TouchableOpacity
           onPress={() => {
             setModalVisiblEditText(true)
@@ -111,7 +114,9 @@ const ParteCard = ({
     </View>
 
           <View style={styles.importesContainer}>
-            {cadaParte.importes.map((cadaImporte: string, indexImp: number) => (
+
+            { !testinfo ? 
+            cadaParte.importes.map((cadaImporte: string, indexImp: number) => (
               <TouchableOpacity
                 key={indexImp}
                 style={[
@@ -123,7 +128,51 @@ const ParteCard = ({
               >
                 <Text style={styles.importeText}>{cadaImporte}</Text>
               </TouchableOpacity>
-            ))}
+            ))
+          :
+            <View>
+              <Text style={[{color:"black",fontSize:16}]}>Antiguos importes:</Text>
+              <View style={styles.importesContainer}>
+                
+                {
+                  cadaParte.imp_anti.map((cadaImporteAN: string, indexImp: number) => (
+                    <TouchableOpacity
+                      key={indexImp}
+                      style={[
+                        styles.impBtn,
+                        selectedImp.par === indexPar && selectedImp.imp === indexImp && styles.selectedImpBtn,
+                      ]}
+                      onPress={() => selectImp(indexImp, indexPar)}
+                      onLongPress={() => deleteImp()}
+                    >
+                      <Text style={styles.importeText}>{cadaImporteAN}</Text>
+                    </TouchableOpacity>
+                  ))
+                }
+              </View>
+              <Text style={[{color:"black",fontSize:16}]}>Nuevos importes:</Text>
+              <View style={styles.importesContainer}>
+                
+                {
+                  cadaParte.importes.map((cadaImporte: string, indexImp: number) => (
+                    <TouchableOpacity
+                      key={indexImp}
+                      style={[
+                        styles.impBtn,
+                        selectedImp.par === indexPar && selectedImp.imp === indexImp && styles.selectedImpBtn,
+                      ]}
+                      onPress={() => selectImp(indexImp, indexPar)}
+                      onLongPress={() => deleteImp()}
+                    >
+                      <Text style={styles.importeText}>{cadaImporte}</Text>
+                    </TouchableOpacity>
+                  ))
+                }
+              </View>
+            </View>
+            
+
+          }
     
             <TouchableOpacity
               onPress={() => {
@@ -151,7 +200,7 @@ const ParteCard = ({
                   onLongPress={() => deleteExtra(indexPar, 'rele')}
                   style={
                     selectedExtras.cual === 'rele' && selectedExtras.parte === indexPar
-                      ? { backgroundColor: 'red' }
+                      ? { backgroundColor: 'red', padding:5, borderRadius:20, alignItems:'center' }
                       : undefined
                   }
                 >
@@ -161,12 +210,13 @@ const ParteCard = ({
                       : ''}
                   </Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   onPress={() => selectExtra(indexPar, 'exclu')}
                   onLongPress={() => deleteExtra(indexPar, 'exclu')}
                   style={
                     selectedExtras.cual === 'exclu' && selectedExtras.parte === indexPar
-                      ? { backgroundColor: 'red' }
+                      ? { backgroundColor: 'red', padding:5, borderRadius:20,alignItems:'center' }
                       : undefined
                   }
                 >
@@ -203,7 +253,7 @@ const styles = StyleSheet.create({
   parteHeader: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 10,
+    marginVertical: 10,
   },
   parteHeaderText: {
     fontSize: 16,
@@ -228,12 +278,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
+    marginVertical:10,
   },
   impBtn: {
     backgroundColor: '#74b9ff',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 20,
+    padding: 10,
+    borderRadius: 10,
+    fontWeight:'bold',
     marginRight: 5,
     marginBottom: 5,
   },
@@ -243,6 +294,8 @@ const styles = StyleSheet.create({
   importeText: {
     color: 'white',
     fontSize: 16,
+    fontWeight:'bold',
+    
   },
   addImpText: {
     fontSize: 25,
@@ -264,6 +317,7 @@ const styles = StyleSheet.create({
   },
   extrasTextContainer: {
     marginLeft: 10,
+    width:'80%',
   },
   extrasText: {
     fontSize: 14,
@@ -276,26 +330,33 @@ const styles = StyleSheet.create({
     width:25
   },
   saveParteButton:{
-    width:60,
+    width:80,
     backgroundColor: '#160092',
     borderRadius: 15,
-    padding: 5,
     marginRight:10,
+    padding:5,
+    alignContent:'center',
+    alignItems:'center'
   },
   editParte:{
-    width:90,
+    width:120,
     backgroundColor: '#160092',
     borderRadius: 15,
-    padding: 5,
+    padding: 10,
+    alignContent:'center',
+    alignItems:'center',
     //marginRight:10,
   },
   deleteParteButtonText: {
     color: 'white',
     fontSize: 16,
+    paddingHorizontal:10,
+    fontWeight:'bold'
   },
   editParteButtonText: {
     color: "#ffffff",
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight:'bold'
   },
   modalContainer: {
     flex: 1,

@@ -143,8 +143,11 @@ async function verifyToken(token: string): Promise<User | null> {
       //navigation.dispatch(StackActions.replace('(tabs)'));
       return true;
     } catch (error) {
+      alert("asdasdasdasd91");
+      alert('http://'+ip['ips']['elegido']+'/api/login')
       alert(String(error));
-      console.error('Error al iniciar sesión:', error);
+      console.error('http://'+ip['ips']['elegido']+'/api/login');
+      console.log()
       return false;
     }
   }

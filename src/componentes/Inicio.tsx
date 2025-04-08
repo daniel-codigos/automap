@@ -4,11 +4,20 @@ import ip from "../ips.json";
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput, Image, Modal, ScrollView, Dimensions, Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
-const StartOptions = ({ delCookies, handleNotification, empezamos }) => {
+const StartOptions = ({ delCookies, handleNotification, empezamos, testinfo}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentTab, setCurrentTab] = useState('basic'); // Tabs: basic, dictionary
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  //const [testOnOff, setTestOnOff] = useState(false);
+  //#4caf50 green
+
+  const onoff = async () => {
+    console.log("onoff")
+    testinfo[1](prev => !prev);
+    console.log(testinfo[0])
+  }
+
 
   const save_user = async () => {
     try {
@@ -27,6 +36,7 @@ const StartOptions = ({ delCookies, handleNotification, empezamos }) => {
       return response.data;
     } catch (error) {
       console.error('Error al verificar el token:', error);
+      alert("asdasdasdasd6");
       alert(error);
       return null;
     }
@@ -35,32 +45,39 @@ const StartOptions = ({ delCookies, handleNotification, empezamos }) => {
   
   return (
     <View style={styles.container}>
-      {/* Delete Cookies Button */}
-      <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={delCookies}>
-        <Text style={styles.buttonText}>Delete Cookies</Text>
+      {/* Delete Cookies - Top Left */}
+      <TouchableOpacity style={[styles.iconButton, styles.topLeft]} onPress={delCookies}>
+        <Text style={styles.iconText}>🗑️</Text>
       </TouchableOpacity>
-
-      {/* Logo */}
-      <Image source={require('../assets/robot.png')} style={styles.logo} />
-
-      {/* Start Button */}
-      <TouchableOpacity style={[styles.button, styles.startButton]} onPress={empezamos}>
-        <Text style={styles.buttonText}>Empezar</Text>
+  
+      {/* Settings - Top Right */}
+      <TouchableOpacity style={[styles.iconButton, styles.topRight]} onPress={() => {
+        setUsername('');
+        setPassword('');
+        setModalVisible(true);
+      }}>
+        <Text style={styles.iconText}>⚙️</Text>
       </TouchableOpacity>
-
-      {/* Open Settings Button */}
-      <TouchableOpacity
-        style={[styles.button, styles.settingsButton]}
-        onPress={() => {
-          setUsername('')
-          setPassword('')
-          setModalVisible(true)
-        }}
-      >
-        <Text style={styles.buttonText}>Configuración</Text>
-      </TouchableOpacity>
-
-      {/* Settings Modal */}
+  
+      {/* Center Content */}
+      <View style={styles.centerContent}>
+        <Image source={require('../assets/robot.png')} style={styles.logo} />
+        <TouchableOpacity style={[styles.button, styles.startButton]} onPress={empezamos}>
+          <Text style={styles.buttonText}>🚀 Empezar</Text>
+        </TouchableOpacity>
+  
+        {/* Toggle tests */}
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>Activar Tests</Text>
+          <TouchableOpacity
+            style={[styles.switch, {  }]}
+            onPress={onoff}
+          >
+            <View style={[styles.switchThumb,{backgroundColor: testinfo[0] ? '#4caf50' : 'black' , alignSelf: testinfo[0] ? 'flex-end' : 'flex-start'}]} />
+          </TouchableOpacity>
+        </View>
+      </View>
+  
       <Modal
         animationType="slide"
         transparent={true}
@@ -138,75 +155,120 @@ const StartOptions = ({ delCookies, handleNotification, empezamos }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 20,
-  },
-  button: {
-    padding: 15,
-    borderRadius: 25,
-    width: 200,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  deleteButton: {
-    backgroundColor: '#e63946',
-  },
-  startButton: {
-    backgroundColor: '#457b9d',
-  },
-  settingsButton: {
-    backgroundColor: '#1d3557',
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '90%',
-    backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#1d3557',
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  tabContainer: {
+  
+ 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#f0f4f8',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    iconButton: {
+      position: 'absolute',
+      padding: 10,
+      backgroundColor: '#e0e0e0',
+      borderRadius: 50,
+      zIndex: 10,
+    },
+    iconText: {
+      fontSize: 22,
+    },
+    topLeft: {
+      top: 20,
+      left: 2,
+    },
+    topRight: {
+      top: 20,
+      right: 2,
+    },
+    centerContent: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    logo: {
+      width: 140,
+      height: 140,
+      marginBottom: 30,
+    },
+    button: {
+      paddingVertical: 14,
+      paddingHorizontal: 30,
+      borderRadius: 25,
+      marginVertical: 10,
+      alignItems: 'center',
+      width: 220,
+    },
+    startButton: {
+      backgroundColor: '#1d3557',
+    },
+    saveButton: {
+      backgroundColor: '#0077b6',
+    },
+    closeButton: {
+      backgroundColor: '#e63946',
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    modalContainer: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      width: '90%',
+      backgroundColor: '#ffffff',
+      borderRadius: 16,
+      padding: 25,
+      alignItems: 'center',
+      elevation: 10,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 20,
+      color: '#1d3557',
+    },
+    input: {
+      width: '100%',
+      padding: 12,
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      marginBottom: 15,
+      fontSize: 16,
+      backgroundColor: '#f8f9fa',
+    },
+    switchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 15,
+      gap: 10,
+    },
+    switchLabel: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#333',
+    },
+    switch: {
+      width: 50,
+      height: 30,
+      borderRadius: 20,
+      backgroundColor: '#cfd8dc',
+      justifyContent: 'center',
+      padding: 4,
+    },
+    switchThumb: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+    },
+      tabContainer: {
     flexDirection: 'row',
     width: '100%',
     marginBottom: 20,
@@ -235,12 +297,8 @@ const styles = StyleSheet.create({
     color: '#6c757d',
     textAlign: 'center',
   },
-  closeButton: {
-    backgroundColor: '#e76f51',
-  },
-  saveButton: {
-    backgroundColor: 'blue',
-  },
-});
 
+  
+  });
+  
 export default StartOptions;
