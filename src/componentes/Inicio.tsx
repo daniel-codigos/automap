@@ -160,10 +160,10 @@ const StartOptions = ({ delCookies, handleNotification, empezamos, testinfo}) =>
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#f0f4f8',
+      backgroundColor: 'white',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 20,
+      padding: 70,
     },
     iconButton: {
       position: 'absolute',
